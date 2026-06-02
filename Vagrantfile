@@ -20,8 +20,8 @@ Vagrant.configure("2") do |config|
     apt-get update -y
     apt-get upgrade -y
 
-    echo "=== Installing Java 17 ==="
-    apt-get install -y openjdk-17-jdk
+    echo "=== Installing Java 21 (Jenkins >= 2.426 requires Java 21+) ==="
+    apt-get install -y openjdk-21-jdk
 
     echo "=== Installing Maven ==="
     apt-get install -y maven
