@@ -1,2 +1,8 @@
 *:Zone.Identifier
 Lab1-CICD-Pipeline-流程.md
+
+# Vagrant runtime directory
+.vagrant/
+
+# Application logs
+*.log
