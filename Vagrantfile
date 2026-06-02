@@ -2,8 +2,8 @@ Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/jammy64"
 
   # Port forwarding: Jenkins UI and deployed app
-  config.vm.network "forwarded_port", guest: 8080, host: 8080   # Jenkins
-  config.vm.network "forwarded_port", guest: 8081, host: 8081   # PetClinic app
+  config.vm.network "forwarded_port", guest: 8080, host: 8888, host_ip: "127.0.0.1"   # Jenkins
+  config.vm.network "forwarded_port", guest: 8081, host: 8081, host_ip: "127.0.0.1"   # PetClinic app
   config.vm.network "forwarded_port", guest: 22,   host: 2222, id: "ssh", auto_correct: true
 
   config.vm.provider "virtualbox" do |vb|
@@ -26,17 +26,19 @@ Vagrant.configure("2") do |config|
     echo "=== Installing Maven ==="
     apt-get install -y maven
 
-    echo "=== Installing Git and curl ==="
-    apt-get install -y git curl
+    echo "=== Installing base tools ==="
+    apt-get install -y git curl wget gnupg ca-certificates fontconfig
 
     echo "=== Installing Jenkins ==="
-    curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key \
-      | tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-    echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+    mkdir -p /etc/apt/keyrings
+    wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+      https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+    chmod 644 /etc/apt/keyrings/jenkins-keyring.asc
+    echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] \
       https://pkg.jenkins.io/debian-stable binary/" \
       | tee /etc/apt/sources.list.d/jenkins.list > /dev/null
     apt-get update -y
-    apt-get install -y jenkins
+    apt-get install -y openjdk-21-jre jenkins
     systemctl enable jenkins
     systemctl start jenkins
 
@@ -46,7 +48,7 @@ Vagrant.configure("2") do |config|
     cat /var/lib/jenkins/secrets/initialAdminPassword || echo "(not yet available)"
 
     echo "=== Provisioning complete ==="
-    echo "Jenkins: http://localhost:8080"
+    echo "Jenkins: http://localhost:8888"
     echo "App:     http://localhost:8081"
   SHELL
 end
